@@ -14,6 +14,9 @@ module PrawnStyledText
 
   @@margin_ul = 0
   @@symbol_ul = ''
+  @@dynamic_br_tags = false
+  @previous_styled_sibling_element_types = []
+  @current_styled_traversal_level = 0
 
   def self.adjust_values( pdf, values )
     ret = {}
@@ -51,7 +54,7 @@ module PrawnStyledText
     # Evalutate tag
     case data[:name]
     when :br # new line
-      context[:text] ||= [ { text: "\n" } ]
+      context[:text] ||= [ { text: line_break_should_include_newline_character? ? "\n" : "" } ]
     when :img # image
       context[:flush] ||= true
       context[:src] = data[:node].get 'src'
@@ -130,16 +133,46 @@ module PrawnStyledText
   end
 
   def self.traverse( nodes, context = [], &block )
+    @current_styled_traversal_level += 1
+
     nodes.each do |node|
       if node.is_a? Oga::XML::Text
         yield :text_node, node.text.delete( "\n\r" ), context
+
+        if node.text.strip.length.positive?
+          @previous_styled_sibling_element_types[@current_styled_traversal_level] = "text"
+        end
       elsif node.is_a? Oga::XML::Element
         element = { name: node.name.to_sym, node: node }
         yield :opening_tag, element[:name], element
         context.push( element )
         traverse( node.children, context, &block ) if node.children.count > 0
         yield :closing_tag, element[:name], context.pop
+
+        @previous_styled_sibling_element_types[@current_styled_traversal_level] = element[:name]
       end
+    end
+
+    # as we step back up the tree, reset stale branches
+    @previous_styled_sibling_element_types[@current_styled_traversal_level] = nil
+    @current_styled_traversal_level -= 1
+  end
+
+  class << self
+    private
+
+    def previous_styled_element_was_block_level?
+      BLOCK_TAGS.include?(@previous_styled_sibling_element_types[@current_styled_traversal_level])
+    end
+
+    def first_element_at_current_node_depth?
+      @previous_styled_sibling_element_types[@current_styled_traversal_level].nil?
+    end
+
+    def line_break_should_include_newline_character?
+      return true unless @@dynamic_br_tags
+
+      previous_styled_element_was_block_level? || first_element_at_current_node_depth?
     end
   end
 end
