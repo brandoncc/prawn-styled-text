@@ -1,7 +1,7 @@
 require 'prawn'
 
 Prawn::Document.class_eval do
-  def styled_text( data )
+  def styled_text( data, method_call_options = {})
     parts = []
     text_options = {}
     extra_options = { margin_left: 0 }
@@ -38,13 +38,18 @@ Prawn::Document.class_eval do
         self.move_down( margin_top ) if margin_top > 0
         margin_left = options.delete( :'margin-left' ).to_i
         extra_options[:margin_left] = margin_left if margin_left > 0
-        if !text_options[:leading] && ( leading = options.delete( :'line-height' ).to_i ) > 0
+        if !text_options[:leading] && ( leading = (options.delete( :'line-height' ) || method_call_options[:leading]).to_i ) > 0
           text_options[:leading] = leading
         end
         text_options[:mode] = options[:mode].to_sym if options[:mode]
         extra_options[:pre] = context[:pre] if context[:pre]
         parts << { text: text }.merge( options ) # push the data
       elsif type == :closing_tag
+        # new line characters didn't receive the same leading as lines with text
+        leading = method_call_options[:leading].to_i # nil.to_i == 0
+
+        move_down(leading)
+
         self.formatted_text( context[:text] ) if context[:text]
         if context[:tag] == :hr
           self.dash( options[:dash].include?( ',' ) ? options[:dash].split( ',' ).map( &:to_i ) : options[:dash].to_i ) if options[:dash]
