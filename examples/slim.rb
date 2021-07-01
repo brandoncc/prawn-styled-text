@@ -11,4 +11,4 @@ pdf = Prawn::Document.new
 pdf.text "\nA test document\n", align: :center, size: 18
 # Slim::Template.new{ 'h1 A test document' }.render
 pdf.styled_text Slim::Template.new( SLIM_FILE ).render
-pdf.render_file 'test.pdf'
+pdf.render_file "#{ARGV[0] || Dir.pwd}/slim.pdf"

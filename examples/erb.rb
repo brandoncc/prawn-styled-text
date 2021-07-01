@@ -10,4 +10,4 @@ Prawn::Font::AFM.hide_m17n_warning = true
 pdf = Prawn::Document.new
 pdf.text "\nA test document\n", align: :center, size: 18
 pdf.styled_text ERB.new( File.read( ERB_FILE ) ).result( binding )
-pdf.render_file 'test.pdf'
+pdf.render_file "#{ARGV[0] || Dir.pwd}/erb.pdf"

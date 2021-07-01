@@ -14,4 +14,4 @@ end
 
 pdf2 = Prawn::Document.new
 pdf2.styled_text File.read( 'dynamic_br.html' )
-pdf2.render_file 'test2.pdf'
+pdf.render_file "#{ARGV[0] || Dir.pwd}/dynamic_br_tags.pdf"

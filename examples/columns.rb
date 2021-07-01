@@ -13,4 +13,4 @@ pdf.styled_text '<h1 style="text-align: center">2 columns</h1>'
 pdf.column_box( [ 0, pdf.cursor ], columns: 2, width: pdf.bounds.width ) do
   pdf.styled_text html * 4
 end
-pdf.render_file 'test.pdf'
+pdf.render_file "#{ARGV[0] || Dir.pwd}/columns.pdf"

@@ -23,4 +23,4 @@ pdf.define_grid(:columns => 3, :rows => 3, :gutter => 10)
 pdf.grid( 1, 1 ).bounding_box do
   pdf.styled_text html
 end
-pdf.render_file 'test.pdf'
+pdf.render_file "#{ARGV[0] || Dir.pwd}/grid.pdf"
