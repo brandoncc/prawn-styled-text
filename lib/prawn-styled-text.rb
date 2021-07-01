@@ -1,1 +1,1 @@
-require 'prawn-styled-text/prawn-styled-text'
+require 'prawn-styled-text/element'
