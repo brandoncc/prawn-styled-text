@@ -17,4 +17,9 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'prawn', '~> 2'
   spec.add_runtime_dependency 'oga', '~> 2'
+
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'minitest'
+  spec.add_development_dependency 'identikal'
+  spec.add_development_dependency 'slim'
 end
